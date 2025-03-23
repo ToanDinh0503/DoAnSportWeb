@@ -102,6 +102,8 @@ CREATE TABLE don_hang (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
 ) ENGINE=InnoDB;
+ALTER TABLE don_hang ADD COLUMN payment_method VARCHAR(50) NOT NULL DEFAULT 'cod';
+ALTER TABLE don_hang ADD COLUMN dia_chi TEXT NOT NULL;
 
 -- Tạo bảng chi tiết đơn hàng
 CREATE TABLE chi_tiet_don_hang (

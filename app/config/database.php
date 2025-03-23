@@ -3,7 +3,7 @@ class Database {
     private $host = "localhost";
     private $database_name = "webbandott";
     private $username = "root";
-    private $password = "";
+    private $password = "Aa@123";
     private static $instance = null;
     private $conn = null;
 

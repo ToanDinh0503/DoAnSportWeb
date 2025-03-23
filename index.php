@@ -9,6 +9,7 @@ require_once __DIR__ . '/app/config/database.php';
 require_once __DIR__ . '/app/models/SanPham.php';
 require_once __DIR__ . '/app/models/DanhMuc.php';
 require_once __DIR__ . '/app/models/ThuongHieu.php';
+require_once __DIR__ . '/app/models/DonHang.php';
 
 // Add error reporting for debugging
 error_reporting(E_ALL);
@@ -18,6 +19,7 @@ ini_set('display_errors', 1);
 $productController = new ProductController();
 
 // Basic routing
+//loai bo phan /webbandoTT ở url
 $request = $_SERVER['REQUEST_URI'];
 $basePath = '/WebbandoTT';
 $route = str_replace($basePath, '', $request);
@@ -72,8 +74,11 @@ switch ($route) {
     case '/thanh-toan':
         require __DIR__ . '/app/views/checkout.php';
         break;
-
+    case '/don-hang':
+        require __DIR__ . '/app/views/orders.php';
+        break;
     case '/tai-khoan':
+        //neu chau dang nahp thi chuyen huong den trang dang nhập
         if (!isset($_SESSION['user_id'])) {
             header('Location: /WebbandoTT/dang-nhap');
             exit;
@@ -107,7 +112,7 @@ switch ($route) {
         header('Location: /WebbandoTT/dang-nhap');
         exit;
 
-    // API Routes
+   // API Routes
     case '/api/san-pham/search':
         header('Content-Type: application/json');
         if ($_SERVER['REQUEST_METHOD'] === 'GET') {

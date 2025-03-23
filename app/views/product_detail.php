@@ -95,7 +95,8 @@ $stmt->execute([$ma_sp]);
                     </div>
 
                     <?php if ($product['tinh_trang'] && $product['so_luong'] > 0): ?>
-                    <form class="detail-add-cart-form">
+                    <form action="/WebbandoTT/app/api/carts/add_to_cart.php" method="POST">
+                        <input type="hidden" name="product_id" value="<?= $product['id']; ?>">
                         <div class="detail-quantity-control">
                             <label class="detail-quantity-label">Số lượng:</label>
                             <div class="input-group">

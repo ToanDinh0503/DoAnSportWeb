@@ -1,3 +1,17 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+require_once __DIR__ . '/../config/database.php';
+
+if (!isset($_SESSION['cart']) || empty($_SESSION['cart'])) {
+    $cart_empty = true;
+} else {
+    $cart_empty = false;
+}
+
+$total = 0;
+?>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -29,11 +43,11 @@
                             </div>
                         <?php else: ?>
                             <?php foreach ($_SESSION['cart'] as $product_id => $item): ?>
-                                <div class="cart-item mb-4 border-bottom pb-4">
+                                <div class="cart-item mb-4 border-bottom pb-4" data-product-id="<?php echo $product_id; ?>">
                                     <div class="row align-items-center">
                                         <div class="col-md-2">
-                                            <img src="/WebbandoTT/public/images/products/<?php echo htmlspecialchars($item['image']); ?>" 
-                                                 class="img-fluid rounded" alt="<?php echo htmlspecialchars($item['name']); ?>">
+                                            <img src="/WebbandoTT/public/images/products/<?php echo htmlspecialchars($item['image'] ?? 'no-image.jpg'); ?>" 
+                                                class="img-fluid rounded" alt="<?php echo htmlspecialchars($item['name']); ?>">
                                         </div>
                                         <div class="col-md-4">
                                             <h5 class="mb-2"><?php echo htmlspecialchars($item['name']); ?></h5>
@@ -41,15 +55,15 @@
                                         </div>
                                         <div class="col-md-3">
                                             <div class="quantity-control d-flex align-items-center">
-                                                <button class="btn btn-outline-secondary btn-sm" data-action="decrease">-</button>
-                                                <input type="number" class="form-control form-control-sm mx-2 text-center quantity-input" 
-                                                       value="<?php echo $item['quantity']; ?>" min="1" max="10" 
-                                                       data-product-id="<?php echo $product_id; ?>" style="width: 60px">
-                                                <button class="btn btn-outline-secondary btn-sm" data-action="increase">+</button>
+                                                <button class="btn btn-outline-secondary btn-sm btn-decrease" data-product-id="<?php echo $product_id; ?>">-</button>
+                                                <input type="number" class="form-control form-control-sm mx-2 text-center quantity-input"
+                                                    value="<?php echo $item['quantity']; ?>" min="1" max="10"
+                                                    data-product-id="<?php echo $product_id; ?>" style="width: 60px">
+                                                <button class="btn btn-outline-secondary btn-sm btn-increase" data-product-id="<?php echo $product_id; ?>">+</button>
                                             </div>
                                         </div>
                                         <div class="col-md-2">
-                                            <div class="fw-bold text-end">
+                                            <div class="fw-bold text-end item-total-price" id="total-<?php echo $product_id; ?>">
                                                 <?php echo number_format($item['price'] * $item['quantity']); ?>₫
                                             </div>
                                         </div>
@@ -83,19 +97,19 @@
                             ?>
                             <div class="d-flex justify-content-between mb-3">
                                 <span>Tạm tính:</span>
-                                <span class="fw-bold"><?php echo number_format($subtotal); ?>₫</span>
+                                <span class="fw-bold" id="subtotal"><?php echo number_format($subtotal); ?>₫</span>
                             </div>
                             <div class="d-flex justify-content-between mb-3">
                                 <span>Phí vận chuyển:</span>
-                                <span class="fw-bold"><?php echo number_format($shipping); ?>₫</span>
+                                <span class="fw-bold" id="shipping-fee"><?php echo number_format($shipping); ?>₫</span>
                             </div>
                             <div class="d-flex justify-content-between mb-4 pt-3 border-top">
                                 <span class="h5 mb-0">Tổng cộng:</span>
-                                <span class="h5 mb-0 text-primary"><?php echo number_format($total); ?>₫</span>
+                                <span class="h5 mb-0 text-primary" id="total-price"><?php echo number_format($total); ?>₫</span>
                             </div>
 
                             <div class="d-grid gap-2">
-                                <button class="btn btn-primary btn-lg">Tiến hành thanh toán</button>
+                                <button class="btn btn-primary btn-lg btn-checkout">Tiến hành thanh toán</button>
                                 <a href="/WebbandoTT/san-pham" class="btn btn-outline-primary">Tiếp tục mua sắm</a>
                             </div>
 
