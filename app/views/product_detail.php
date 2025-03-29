@@ -1,6 +1,7 @@
 <?php
 include 'includes/header.php';
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../controllers/ReviewController.php';
 
 // Lấy mã sản phẩm từ URL
 $ma_sp = basename($_SERVER['REQUEST_URI']);
@@ -22,6 +23,13 @@ $product = $stmt->fetch(PDO::FETCH_ASSOC);
 $update_sql = "UPDATE san_pham SET luot_xem = luot_xem + 1 WHERE ma_sp = ?";
 $stmt = $conn->prepare($update_sql);
 $stmt->execute([$ma_sp]);
+
+// Now get reviews after we have the product
+$reviewController = new ReviewController();
+$reviews = $reviewController->getProductReviews($product['id']);
+$avgRating = $reviewController->danhGiaModel->getAverageRating($product['id']);
+$averageRating = round($avgRating['avg_rating'] ?? 0, 1);
+$totalReviews = $avgRating['total_reviews'] ?? 0;
 ?>
 
 <div class="product-detail">
@@ -80,6 +88,17 @@ $stmt->execute([$ma_sp]);
                             <span class="detail-meta-label">Lượt xem:</span>
                             <span><?= number_format($product['luot_xem']) ?></span>
                         </div>
+                        <div class="detail-meta-item">
+                            <span class="detail-meta-label">Đánh giá:</span>
+                            <span class="d-flex align-items-center">
+                                <div class="star-rating me-2">
+                                    <?php for($i = 1; $i <= 5; $i++): ?>
+                                        <i class="bi bi-star<?= $i <= $averageRating ? '-fill text-warning' : ($i - $averageRating <= 0.5 ? '-half text-warning' : '') ?>"></i>
+                                    <?php endfor; ?>
+                                </div>
+                                <span>(<?= $averageRating ?>/5 - <?= $totalReviews ?> đánh giá)</span>
+                            </span>
+                        </div>
                     </div>
 
                     <div class="detail-price-wrapper">
@@ -108,6 +127,49 @@ $stmt->execute([$ma_sp]);
                             <span class="detail-stock-info">(Còn <?= $product['so_luong'] ?> sản phẩm)</span>
                         </div>
                         
+                        <!-- Thêm phần chọn màu sắc và kích thước -->
+                        <div class="product-variations mt-4 mb-4">
+                            <?php if (!empty($product['mau_sac'])): ?>
+                            <div class="variation-group mb-4">
+                                <label class="form-label">Màu sắc:</label>
+                                <div class="btn-group" role="group">
+                                    <?php 
+                                    $colors = explode(',', $product['mau_sac']);
+                                    foreach ($colors as $color): 
+                                    ?>
+                                        <input type="radio" class="btn-check" name="color" 
+                                               id="color_<?= htmlspecialchars(trim($color)) ?>" 
+                                               value="<?= htmlspecialchars(trim($color)) ?>" required>
+                                        <label class="btn btn-outline-dark" style="margin-left: 20px" 
+                                               for="color_<?= htmlspecialchars(trim($color)) ?>">
+                                            <?= htmlspecialchars(trim($color)) ?>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+
+                            <?php if (!empty($product['kich_thuoc'])): ?>
+                            <div class="variation-group">
+                                <label class="form-label">Kích thước:</label>
+                                <div class="btn-group" role="group">
+                                    <?php 
+                                    $sizes = explode(',', $product['kich_thuoc']);
+                                    foreach ($sizes as $size): 
+                                    ?>
+                                        <input type="radio" class="btn-check" name="size" 
+                                               id="size_<?= htmlspecialchars(trim($size)) ?>" 
+                                               value="<?= htmlspecialchars(trim($size)) ?>" required>
+                                        <label class="btn btn-outline-dark" style="margin-left: 20px" 
+                                               for="size_<?= htmlspecialchars(trim($size)) ?>">
+                                            <?= htmlspecialchars(trim($size)) ?>
+                                        </label>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <?php endif; ?>
+                        </div>
+
                         <div class="detail-buttons">
                             <button type="submit" class="detail-add-to-cart">
                                 <i class="bi bi-cart-plus"></i>
@@ -120,6 +182,8 @@ $stmt->execute([$ma_sp]);
                         </div>
                     </form>
                     <?php endif; ?>
+
+                    
 
                     <div class="detail-social-share">
                         <a href="#" class="detail-social-btn detail-facebook"><i class="bi bi-facebook"></i></a>
@@ -138,10 +202,11 @@ $stmt->execute([$ma_sp]);
         </div>
 
         <!-- Product Tabs -->
+        <!-- Product Tabs -->
         <div class="detail-tabs">
             <ul class="nav nav-tabs detail-tab-nav" role="tablist">
                 <li class="nav-item">
-                    <a class="nav-link detail-tab-link active" data-bs-toggle="tab" href="#description" style="border: none">Mô tả</a>
+                    <a class="nav-link detail-tab-link active" data-bs-toggle="tab" href="#description" style="border: none">Mô tả chi tiết</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link detail-tab-link" data-bs-toggle="tab" href="#specifications" style="border: none">Thông số kỹ thuật</a>
@@ -161,7 +226,26 @@ $stmt->execute([$ma_sp]);
                     <div id="specifications" class="tab-pane fade">
                         <table class="table table-striped">
                             <tbody>
-                                <!-- Thêm thông số kỹ thuật chi tiết -->
+                                <tr>
+                                    <td><strong>Màu sắc:</strong></td>
+                                    <td><?= htmlspecialchars($product['mau_sac'] ?? 'Chưa cập nhật') ?></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Kích thước:</strong></td>
+                                    <td><?= htmlspecialchars($product['kich_thuoc'] ?? 'Chưa cập nhật') ?></td>
+                                </tr>
+                                <tr>
+                                    <td width="30%"><strong>Chất liệu:</strong></td>
+                                    <td><?= htmlspecialchars($product['chat_lieu'] ?? 'Chưa cập nhật') ?></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Xuất xứ:</strong></td>
+                                    <td><?= htmlspecialchars($product['xuat_xu'] ?? 'Chưa cập nhật') ?></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Bảo hành:</strong></td>
+                                    <td><?= htmlspecialchars($product['bao_hanh'] ?? 'Chưa cập nhật') ?></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -169,48 +253,60 @@ $stmt->execute([$ma_sp]);
                     <div id="reviews" class="tab-pane fade">
                         <div class="review-form mb-4">
                             <?php if (isset($_SESSION['user_id'])): ?>
-                            <form>
-                                <div class="mb-3">
-                                    <label class="form-label">Đánh giá của bạn</label>
-                                    <div class="rating-input">
-                                        <?php for($i = 5; $i >= 1; $i--): ?>
-                                            <input type="radio" name="rating" value="<?= $i ?>" id="star<?= $i ?>">
-                                            <label for="star<?= $i ?>"><i class="bi bi-star-fill"></i></label>
-                                        <?php endfor; ?>
+                                <form id="reviewForm">
+                                    <input type="hidden" name="san_pham_id" value="<?= $product['id'] ?>">
+                                    <div class="mb-3">
+                                        <label class="form-label">Đánh giá của bạn</label>
+                                        <div class="rating-input">
+                                            <?php for($i = 5; $i >= 1; $i--): ?>
+                                                <input type="radio" name="diem_danh_gia" value="<?= $i ?>" id="star<?= $i ?>" required>
+                                                <label for="star<?= $i ?>"><i class="bi bi-star-fill"></i></label>
+                                            <?php endfor; ?>
+                                        </div>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Nhận xét của bạn</label>
+                                        <textarea class="form-control" name="noi_dung" rows="3" required></textarea>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
+                                </form>
+                            <?php else: ?>
+                                <div class="alert alert-info">
+                                    Vui lòng <a href="/WebbandoTT/dang-nhap">đăng nhập</a> để viết đánh giá
                                 </div>
-                                <div class="mb-3">
-                                    <label class="form-label">Nhận xét của bạn</label>
-                                    <textarea class="form-control" rows="3" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-primary">Gửi đánh giá</button>
-                            </form>
+                            <?php endif; ?>
                         </div>
-                            <!-- Reviews List -->
-                            <div class="reviews-list">
-                                <!-- Sample Review -->
-                                <div class="review-item">
-                                    <div class="review-header">
-                                        <span class="reviewer-name">Nguyễn Văn A</span>
-                                        <span class="review-date">20/11/2023</span>
+
+                        <div class="reviews-list mt-4">
+                            <?php if (!empty($reviews)): ?>
+                                <?php foreach ($reviews as $review): ?>
+                                    <div class="review-item mb-4 p-3 border rounded bg-light">
+                                        <div class="review-header d-flex justify-content-between align-items-center mb-2">
+                                            <div class="reviewer-info">
+                                                <span class="reviewer-name fw-bold"><?= htmlspecialchars($review['ten_nguoi_dung']) ?></span>
+                                                <small class="text-muted ms-2"><?= date('d/m/Y H:i', strtotime($review['created_at'])) ?></small>
+                                            </div>
+                                            <div class="star-rating">
+                                                <?php for($i = 1; $i <= 5; $i++): ?>
+                                                    <i class="bi bi-star<?= $i <= $review['diem_danh_gia'] ? '-fill text-warning' : '' ?>"></i>
+                                                <?php endfor; ?>
+                                            </div>
+                                        </div>
+                                        <div class="review-content">
+                                            <?= nl2br(htmlspecialchars($review['noi_dung'])) ?>
+                                        </div>
                                     </div>
-                                    <div class="star-rating">
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-fill"></i>
-                                        <i class="bi bi-star-half"></i>
-                                    </div>
-                                    <p class="review-content">
-                                        Sản phẩm rất tốt, chất lượng cao, đóng gói cẩn thận...
-                                    </p>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <div class="text-center p-4">
+                                    <div class="mb-3"><i class="bi bi-chat-square-text" style="font-size: 2rem;"></i></div>
+                                    <p class="text-muted">Chưa có đánh giá nào cho sản phẩm này</p>
+                                    <?php if (isset($_SESSION['user_id'])): ?>
+                                        <p>Hãy là người đầu tiên đánh giá sản phẩm!</p>
+                                    <?php endif; ?>
                                 </div>
-                            </div>
-                        <?php else: ?></div>
-                            <div class="alert alert-info">
-                                Vui lòng <a href="/WebbandoTT/dang-nhap">đăng nhập</a> để viết đánh giá
-                            </div>
-                        <?php endif; ?>
+                            <?php endif; ?>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -307,6 +403,32 @@ $stmt->execute([$ma_sp]);
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="/WebbandoTT/app/public/js/main.js"></script>
 <script>
+document.getElementById('addToCartForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Ngăn chặn hành vi mặc định của form
+
+    const formData = new FormData(this); // Lấy dữ liệu từ form
+
+    try {
+        const response = await fetch('/WebbandoTT/app/api/carts/add_to_cart.php', {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+
+        if (result.success) {
+            // Cập nhật số lượng sản phẩm trong giỏ hàng
+            alert(result.message); // Hiển thị thông báo thành công
+            updateCartCount(result.cart_count); // Cập nhật số lượng giỏ hàng
+        } else {
+            alert(result.message); // Hiển thị thông báo lỗi
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng.');
+    }
+});
+</script>
+<script>
 function changeMainImage(src) {
     document.getElementById('main-product-image').src = src;
     document.querySelectorAll('.detail-thumbnail').forEach(thumb => {
@@ -330,6 +452,44 @@ function updateQuantity(action) {
 document.querySelector('.detail-add-cart-form')?.addEventListener('submit', function(e) {
     e.preventDefault();
 });
+document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        
+        const formData = new FormData(this);
+
+        fetch('/WebbandoTT/api/reviews/add', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Thành công',
+                    text: data.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                }).then(() => {
+                    window.location.reload();
+                });
+            } else {
+                throw new Error(data.message || 'Có lỗi xảy ra khi gửi đánh giá');
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi',
+                text: error.message || 'Không thể gửi đánh giá'
+            });
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+        });
+    });
 </script>
 
 <?php include 'includes/footer.php'; ?>

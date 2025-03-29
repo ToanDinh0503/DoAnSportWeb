@@ -116,7 +116,7 @@ $brands = $data['brands'];
                                     <td><?= $product['so_luong'] ?></td>
                                     <td>
                                         <span class="status-badge <?= $product['tinh_trang'] == 1 ? 'in-stock' : 'out-of-stock' ?>">
-                                            <?= $product['tinh_trang'] == 1 ? 'Còn hàng' : 'Hết hàng' ?>
+                                            <?= $product['tinh_trang'] == 1 ? 'Còn bán' : 'Ngừng bán' ?>
                                         </span>
                                     </td>
                                     <td>

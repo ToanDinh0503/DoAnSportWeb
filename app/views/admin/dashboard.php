@@ -131,6 +131,8 @@ $route = str_replace('/WebbandoTT', '', $route);
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> <!-- Đảm bảo SweetAlert2 được tải cuối -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/WebbandoTT/app/public/js/admin/dashboard.js"></script>
 </body>
 </html>

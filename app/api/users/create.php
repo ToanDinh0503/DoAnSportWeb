@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../config/database.php';
-require_once __DIR__ . '/../../models/User.php';
+require_once __DIR__ . '/../../models/NguoiDung.php';
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -10,27 +10,46 @@ try {
 
     $database = Database::getInstance();
     $db = $database->getConnection();
-    $user = new User($db);
+    $nguoiDung = new NguoiDung($db);
 
-    $data = json_decode(file_get_contents("php://input"), true);
+    // Validate required fields
+    if (empty($_POST['username']) || empty($_POST['password']) || empty($_POST['email']) || empty($_POST['ho_ten'])) {
+        throw new Exception('Vui lòng điền đầy đủ thông tin bắt buộc');
+    }
 
-    // Gán giá trị cho đối tượng User
-    $user->username = $data['username'];
-    $user->password = $data['password'];
-    $user->email = $data['email'];
-    $user->ho_ten = $data['ho_ten'];
-    $user->so_dien_thoai = $data['so_dien_thoai'];
-    $user->dia_chi = $data['dia_chi'];
-    $user->role = $data['role'] ?? 'user';  // Mặc định role là 'user'
-    $user->trang_thai = $data['trang_thai'] ?? 1; // Mặc định trạng thái là 1
+    // Check if username already exists
+    if ($nguoiDung->usernameExists($_POST['username'])) {
+        throw new Exception('Tên đăng nhập đã tồn tại');
+    }
 
-    if ($user->create()) {
-        echo json_encode(['success' => true, 'message' => 'Người dùng đã được thêm thành công']);
+    // Check if email already exists
+    if ($nguoiDung->emailExists($_POST['email'])) {
+        throw new Exception('Email đã tồn tại');
+    }
+
+    // Set user data
+    $nguoiDung->username = trim($_POST['username']);
+    $nguoiDung->password = $_POST['password'];
+    $nguoiDung->email = trim($_POST['email']);
+    $nguoiDung->ho_ten = trim($_POST['ho_ten']);
+    $nguoiDung->so_dien_thoai = trim($_POST['so_dien_thoai'] ?? '');
+    $nguoiDung->dia_chi = trim($_POST['dia_chi'] ?? '');
+    $nguoiDung->role = $_POST['role'] ?? 'user';
+    $nguoiDung->trang_thai = isset($_POST['trang_thai']) ? intval($_POST['trang_thai']) : 1;
+
+    if ($nguoiDung->create()) {
+        echo json_encode([
+            'success' => true,
+            'message' => 'Thêm người dùng thành công'
+        ]);
     } else {
         throw new Exception('Không thể thêm người dùng');
     }
+
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['success' => false, 'message' => $e->getMessage()]);
+    echo json_encode([
+        'success' => false,
+        'message' => $e->getMessage()
+    ]);
 }
-?>

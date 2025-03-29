@@ -218,53 +218,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (checkoutbutton) {
     checkoutbutton.addEventListener("click", function () {
       window.location.href = "/WebbandoTT/don-hang";
-      //   Swal.fire({
-      //     title: "Xác nhận đặt hàng?",
-      //     text: "Bạn có chắc chắn muốn đặt hàng không?",
-      //     icon: "warning",
-      //     showCancelButton: true,
-      //     confirmButtonText: "Đặt hàng",
-      //     cancelButtonText: "Hủy",
-      //     confirmButtonColor: "#28a745",
-      //   }).then((result) => {
-      //     if (result.isConfirmed) {
-      //       fetch("checkout.php", {
-      //         method: "POST",
-      //         headers: {
-      //           "Content-Type": "application/x-www-form-urlencoded",
-      //         },
-      //         body: "ghi_chu=" + document.getElementById("order-note").value,
-      //       })
-      //         .then((response) => response.json())
-      //         .then((data) => {
-      //           if (data.success) {
-      //             Swal.fire({
-      //               icon: "success",
-      //               title: "Thành công",
-      //               text: "Đặt hàng thành công!",
-      //               showConfirmButton: false,
-      //               timer: 2000,
-      //             }).then(() => {
-      //               window.location.href = "/WebbandoTT/don-hang";
-      //             });
-      //           } else {
-      //             Swal.fire({
-      //               icon: "error",
-      //               title: "Lỗi",
-      //               text: data.message || "Đặt hàng thất bại",
-      //             });
-      //           }
-      //         })
-      //         .catch((error) => {
-      //           console.error("Lỗi:", error);
-      //           Swal.fire({
-      //             icon: "error",
-      //             title: "Lỗi",
-      //             text: "Có lỗi xảy ra khi đặt hàng",
-      //           });
-      //         });
-      //     }
-      //   });
     });
   }
 

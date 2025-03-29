@@ -96,6 +96,50 @@ class DonHang {
 
         return $stmt->execute();
     }
+    public function update() {
+        try {
+            $query = "UPDATE " . $this->table_name . " SET 
+                        ma_don_hang = :ma_don_hang,
+                        user_id = :user_id,
+                        tong_tien = :tong_tien,
+                        phi_van_chuyen = :phi_van_chuyen,
+                        trang_thai = :trang_thai,
+                        ghi_chu = :ghi_chu,
+                        payment_method = :payment_method,
+                        dia_chi = :dia_chi,
+                        updated_at = CURRENT_TIMESTAMP
+                      WHERE id = :id";
+    
+            $stmt = $this->conn->prepare($query);
+    
+            // Sanitize input
+            $this->ma_don_hang = htmlspecialchars(strip_tags($this->ma_don_hang));
+            $this->user_id = htmlspecialchars(strip_tags($this->user_id));
+            $this->tong_tien = htmlspecialchars(strip_tags($this->tong_tien));
+            $this->phi_van_chuyen = htmlspecialchars(strip_tags($this->phi_van_chuyen));
+            $this->trang_thai = htmlspecialchars(strip_tags($this->trang_thai));
+            $this->ghi_chu = htmlspecialchars(strip_tags($this->ghi_chu));
+            $this->payment_method = htmlspecialchars(strip_tags($this->payment_method));
+            $this->dia_chi = htmlspecialchars(strip_tags($this->dia_chi));
+            $this->id = htmlspecialchars(strip_tags($this->id));
+    
+            // Bind parameters
+            $stmt->bindParam(":ma_don_hang", $this->ma_don_hang);
+            $stmt->bindParam(":user_id", $this->user_id);
+            $stmt->bindParam(":tong_tien", $this->tong_tien);
+            $stmt->bindParam(":phi_van_chuyen", $this->phi_van_chuyen);
+            $stmt->bindParam(":trang_thai", $this->trang_thai);
+            $stmt->bindParam(":ghi_chu", $this->ghi_chu);
+            $stmt->bindParam(":payment_method", $this->payment_method);
+            $stmt->bindParam(":dia_chi", $this->dia_chi);
+            $stmt->bindParam(":id", $this->id, PDO::PARAM_INT);
+    
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error in DonHang::update: " . $e->getMessage());
+            return false;
+        }
+    }
 
     // Xóa đơn hàng
     public function delete() {
@@ -106,23 +150,41 @@ class DonHang {
 
         return $stmt->execute();
     }
-
-    // Lấy tất cả đơn hàng có phân trang
-    public function getAllOrders($page = 1, $limit = 10) {
-        $start = ($page - 1) * $limit;
+// Lấy toàn bộ đơn hàng (không phân trang)
+public function getAllOrdersNoPagination() {
+    try {
         $query = "SELECT dh.*, u.username, u.email 
                   FROM " . $this->table_name . " dh
                   LEFT JOIN users u ON dh.user_id = u.id
-                  ORDER BY dh.created_at DESC
-                  LIMIT :start, :limit";
+                  ORDER BY dh.created_at DESC";
 
         $stmt = $this->conn->prepare($query);
-        $stmt->bindValue(':start', $start, PDO::PARAM_INT);
-        $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
         $stmt->execute();
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        error_log("Error in DonHang::getAllOrdersNoPagination: " . $e->getMessage());
+        return [];
     }
+}
+   // Lấy tất cả đơn hàng có phân trang
+public function getAllOrders($page = 1, $limit = 10) {
+    $start = ($page - 1) * $limit;
+    $query = "SELECT dh.*, u.username, u.email 
+              FROM " . $this->table_name . " dh
+              LEFT JOIN users u ON dh.user_id = u.id
+              ORDER BY dh.created_at DESC
+              LIMIT :start, :limit";
+
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindValue(':start', $start, PDO::PARAM_INT);
+    $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+    $stmt->execute();
+
+    // Kiểm tra xem có dữ liệu nào được trả về không
+    $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    return $result ? $result : []; // Trả về mảng rỗng nếu không có dữ liệu
+}
 
     // Lấy tổng số đơn hàng
     public function getTotalOrders() {

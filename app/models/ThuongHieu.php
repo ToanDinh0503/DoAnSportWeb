@@ -135,5 +135,49 @@ class ThuongHieu {
         $row = $stmt->fetch(PDO::FETCH_ASSOC);
         return $row['total'];
     }
+
+    public function getAllBrands($page = 1, $limit = 10) {
+        try {
+            $start = ($page - 1) * $limit;
+            $query = "SELECT th.*
+                     FROM " . $this->table_name . " th
+                     ORDER BY th.created_at DESC
+                     LIMIT :start, :limit";
+
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindValue(':start', (int)$start, PDO::PARAM_INT);
+            $stmt->bindValue(':limit', (int)$limit, PDO::PARAM_INT);
+            $stmt->execute();
+
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {
+            error_log("Error in getAllBrands: " . $e->getMessage());
+            return [];
+        }
+    }
+
+    public function getTotalBrands() {
+        try {
+            $query = "SELECT COUNT(*) FROM " . $this->table_name;
+            $stmt = $this->conn->query($query);
+            return $stmt->fetchColumn();
+        } catch(PDOException $e) {
+            error_log("Error in getTotalBrands: " . $e->getMessage());
+            return 0;
+        }
+    }
+    public function getBrand($id) {
+        try {
+            $query = "SELECT * FROM " . $this->table_name . " WHERE id = :id";
+            $stmt = $this->conn->prepare($query);
+            $stmt->bindParam(":id", $id);
+            $stmt->execute();
+            
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch(PDOException $e) {
+            error_log("Error in getBrand: " . $e->getMessage());
+            return null;
+        }
+    }
 }
 ?>

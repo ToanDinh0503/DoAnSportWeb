@@ -1,7 +1,6 @@
 <?php
 require_once __DIR__ . '/BaseController.php';
 require_once __DIR__ . '/../models/DonHang.php';
-require_once __DIR__ . '/../config/database.php';
 
 class OrderController extends BaseController {
     private $donHangModel;
@@ -11,7 +10,7 @@ class OrderController extends BaseController {
         $this->donHangModel = new DonHang($this->db);
     }
 
-    // Danh sách đơn hàng với phân trang
+    // Lấy danh sách đơn hàng (có phân trang)
     public function index($page = 1) {
         try {
             $limit = 10;
@@ -36,70 +35,78 @@ class OrderController extends BaseController {
         }
     }
 
-    // Lấy thông tin đơn hàng theo ID
+    public function getAllOrdersNoPagination() {
+        try {
+            $orders = $this->donHangModel->getAllOrdersNoPagination();
+            return [
+                'orders' => $orders
+            ];
+        } catch (Exception $e) {
+            error_log("Error in OrderController::getAllOrdersNoPagination: " . $e->getMessage());
+            return [
+                'orders' => []
+            ];
+        }
+    }
+    // Lấy đơn hàng theo ID
     public function getOrderById($id) {
         try {
-            return $this->donHangModel->getOrderById($id) ?? null;
+            $order = $this->donHangModel->getOrderById($id);
+            return [
+                'order' => $order
+            ];
         } catch (Exception $e) {
             error_log("Error in OrderController::getOrderById: " . $e->getMessage());
-            return null;
-        }
-    }
-
-    // Lấy danh sách đơn hàng theo user_id
-    public function getOrdersByUser($user_id) {
-        try {
-            return $this->donHangModel->read($user_id) ?? [];
-        } catch (Exception $e) {
-            error_log("Error in OrderController::getOrdersByUser: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Lấy danh sách đơn hàng theo trạng thái
-    public function getOrdersByStatus($status) {
-        try {
-            return $this->donHangModel->getOrdersByStatus($status) ?? [];
-        } catch (Exception $e) {
-            error_log("Error in OrderController::getOrdersByStatus: " . $e->getMessage());
-            return [];
-        }
-    }
-
-    // Tạo đơn hàng mới
-    public function createOrder($data) {
-        try {
-            $this->donHangModel->user_id = $data['user_id'];
-            $this->donHangModel->tong_tien = $data['tong_tien'];
-            $this->donHangModel->phi_van_chuyen = $data['phi_van_chuyen'] ?? 0;
-            $this->donHangModel->trang_thai = 'pending';
-            $this->donHangModel->ghi_chu = $data['ghi_chu'] ?? '';
-
-            return $this->donHangModel->create();
-        } catch (Exception $e) {
-            error_log("Error in OrderController::createOrder: " . $e->getMessage());
-            return false;
+            return [
+                'order' => null
+            ];
         }
     }
 
     // Cập nhật trạng thái đơn hàng
     public function updateOrderStatus($id, $status) {
         try {
-            return $this->donHangModel->updateStatus($id, $status);
+            $success = $this->donHangModel->updateStatus($id, $status);
+            return [
+                'success' => $success
+            ];
         } catch (Exception $e) {
             error_log("Error in OrderController::updateOrderStatus: " . $e->getMessage());
-            return false;
+            return [
+                'success' => false
+            ];
         }
     }
 
-    // Xóa đơn hàng
+    // Xoá đơn hàng
     public function deleteOrder($id) {
         try {
             $this->donHangModel->id = $id;
-            return $this->donHangModel->delete();
+            $success = $this->donHangModel->delete();
+            return [
+                'success' => $success
+            ];
         } catch (Exception $e) {
             error_log("Error in OrderController::deleteOrder: " . $e->getMessage());
-            return false;
+            return [
+                'success' => false
+            ];
+        }
+    }
+
+    // Lọc đơn hàng theo trạng thái
+    public function getOrdersByStatus($status) {
+        try {
+            $stmt = $this->donHangModel->getOrdersByStatus($status);
+            $orders = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            return [
+                'orders' => $orders
+            ];
+        } catch (Exception $e) {
+            error_log("Error in OrderController::getOrdersByStatus: " . $e->getMessage());
+            return [
+                'orders' => []
+            ];
         }
     }
 }

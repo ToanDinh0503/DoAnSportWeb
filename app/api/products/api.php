@@ -14,6 +14,11 @@ try {
             'ten_sp' => $_POST['ten_sp'],
             'mo_ta' => $_POST['mo_ta'],
             'mo_ta_chi_tiet' => $_POST['mo_ta_chi_tiet'],
+            'kich_thuoc' => $_POST['kich_thuoc'],
+            'mau_sac' => $_POST['mau_sac'],
+            'chat_lieu' => $_POST['chat_lieu'],
+            'xuat_xu' => $_POST['xuat_xu'],
+            'bao_hanh' => $_POST['bao_hanh'],
             'gia' => $_POST['gia'],
             'gia_khuyen_mai' => $_POST['gia_khuyen_mai'] ?: null,
             'so_luong' => $_POST['so_luong'],
@@ -40,10 +45,9 @@ try {
             }
         }
 
-        foreach ($sanPham as $property => $value) {
-            if (isset($data[$property])) {
-                $sanPham->$property = $data[$property];
-            }
+        // Assign all properties from data array to model
+        foreach ($data as $property => $value) {
+            $sanPham->$property = $value;
         }
 
         if ($sanPham->create()) {

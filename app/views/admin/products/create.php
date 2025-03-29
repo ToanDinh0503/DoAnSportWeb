@@ -95,6 +95,48 @@ $brands = $data['brands'];
                                         </div>
                                     </div>
                                 </div>
+                                <div class="form-section mt-4">
+                                    <h5 class="form-section-title">Thông số kỹ thuật</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Kích thước<span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="kich_thuoc" required
+                                                    placeholder="VD: S,M,L,XL hoặc 38,39,40,41,42">
+                                                <div class="form-text">Nhập các kích thước, phân cách bằng dấu phẩy</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Màu sắc<span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="mau_sac" required
+                                                    placeholder="VD: Đen,Trắng,Xám">
+                                                <div class="form-text">Nhập các màu sắc, phân cách bằng dấu phẩy</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Chất liệu</label>
+                                                <input type="text" class="form-control" name="chat_lieu" 
+                                                    placeholder="VD: 95% cotton, 5% spandex">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Xuất xứ</label>
+                                                <input type="text" class="form-control" name="xuat_xu"
+                                                    placeholder="VD: Việt Nam">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Bảo hành</label>
+                                                <input type="text" class="form-control" name="bao_hanh"
+                                                    placeholder="VD: 12 tháng">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-4">
@@ -124,7 +166,7 @@ $brands = $data['brands'];
                                     <h5 class="form-section-title">Trạng thái</h5>
                                     <div class="form-check form-switch mb-3">
                                         <input class="form-check-input" type="checkbox" name="tinh_trang" value="1" checked>
-                                        <label class="form-check-label">Còn hàng</label>
+                                        <label class="form-check-label">Còn bán</label>
                                     </div>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" name="noi_bat" value="1">

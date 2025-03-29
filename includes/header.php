@@ -89,7 +89,7 @@
                         </div>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link btn-hover px-4" href="/WebbandoTT/blog">
+                        <a class="nav-link btn-hover px-4" href="/WebbandoTT/bai-viet">
                             <i class="bi bi-newspaper me-2"></i>Bài viết
                         </a>
                     </li>

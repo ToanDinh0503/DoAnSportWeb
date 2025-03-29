@@ -110,6 +110,54 @@ if (!$product) {
                                         </div>
                                     </div>
                                 </div>
+
+                                <div class="form-section mt-4">
+                                    <h5 class="form-section-title">Thông số kỹ thuật</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Kích thước<span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="kich_thuoc" 
+                                                    value="<?= htmlspecialchars($product['kich_thuoc']) ?>" required
+                                                    placeholder="VD: S,M,L,XL hoặc 38,39,40,41,42">
+                                                <div class="form-text">Nhập các kích thước, phân cách bằng dấu phẩy</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Màu sắc<span class="text-danger">*</span></label>
+                                                <input type="text" class="form-control" name="mau_sac" 
+                                                    value="<?= htmlspecialchars($product['mau_sac']) ?>" required
+                                                    placeholder="VD: Đen,Trắng,Xám">
+                                                <div class="form-text">Nhập các màu sắc, phân cách bằng dấu phẩy</div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Chất liệu</label>
+                                                <input type="text" class="form-control" name="chat_lieu"
+                                                    value="<?= htmlspecialchars($product['chat_lieu']) ?>"
+                                                    placeholder="VD: 95% cotton, 5% spandex">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Xuất xứ</label>
+                                                <input type="text" class="form-control" name="xuat_xu"
+                                                    value="<?= htmlspecialchars($product['xuat_xu']) ?>"
+                                                    placeholder="VD: Việt Nam">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="form-label">Bảo hành</label>
+                                                <input type="text" class="form-control" name="bao_hanh"
+                                                    value="<?= htmlspecialchars($product['bao_hanh']) ?>"
+                                                    placeholder="VD: 12 tháng">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <div class="col-md-4">
@@ -143,7 +191,7 @@ if (!$product) {
                                     <h5 class="form-section-title">Trạng thái</h5>
                                     <div class="form-check form-switch mb-3">
                                         <input class="form-check-input" type="checkbox" name="tinh_trang" value="1" <?= $product['tinh_trang'] == 1 ? 'checked' : '' ?>>
-                                        <label class="form-check-label">Còn hàng</label>
+                                        <label class="form-check-label">Còn bán</label>
                                     </div>
                                     <div class="form-check form-switch">
                                         <input class="form-check-input" type="checkbox" name="noi_bat" value="1" <?= $product['noi_bat'] == 1 ? 'checked' : '' ?>>
@@ -167,13 +215,15 @@ if (!$product) {
                             </div>
                         </div>
 
-                        <div class="form-actions mt-4">
-                            <button type="button" class="btn btn-secondary" onclick="history.back()">
-                                <i class='bx bx-arrow-back'></i> Quay lại
-                            </button>
-                            <button type="submit" class="btn btn-primary">
-                                <i class='bx bx-save'></i> Cập nhật sản phẩm
-                            </button>
+                        <div class="form-section">
+                            <div class="form-actions mt-4">
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">
+                                    <i class='bx bx-arrow-back'></i> Quay lại
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class='bx bx-save'></i> Cập nhật sản phẩm
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>

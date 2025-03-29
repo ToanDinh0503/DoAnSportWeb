@@ -34,7 +34,12 @@ try {
         'thuong_hieu_id' => filter_var($_POST['thuong_hieu_id'], FILTER_SANITIZE_NUMBER_INT),
         'tinh_trang' => isset($_POST['tinh_trang']) ? 1 : 0,
         'noi_bat' => isset($_POST['noi_bat']) ? 1 : 0,
-        'hinh_anh' => $existingProduct['hinh_anh'] // Giữ lại ảnh cũ
+        'hinh_anh' => $existingProduct['hinh_anh'], // Giữ lại ảnh cũ
+        'kich_thuoc' => filter_var($_POST['kich_thuoc'], FILTER_SANITIZE_STRING),
+        'mau_sac' => filter_var($_POST['mau_sac'], FILTER_SANITIZE_STRING),
+        'chat_lieu' => filter_var($_POST['chat_lieu'], FILTER_SANITIZE_STRING),
+        'xuat_xu' => filter_var($_POST['xuat_xu'], FILTER_SANITIZE_STRING),
+        'bao_hanh' => filter_var($_POST['bao_hanh'], FILTER_SANITIZE_STRING)
     ];
 
     // Chỉ xử lý ảnh mới nếu có file được tải lên

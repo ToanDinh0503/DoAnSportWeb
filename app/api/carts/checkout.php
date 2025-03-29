@@ -49,6 +49,13 @@ try {
             $chiTietDonHang->so_luong = $item['quantity'];
             $chiTietDonHang->gia = $item['price'];
             $chiTietDonHang->create();
+
+            // Update product stock in the san_pham table
+            $update_stock_sql = "UPDATE san_pham SET so_luong = so_luong - :quantity WHERE id = :product_id";
+            $stmt = $conn->prepare($update_stock_sql);
+            $stmt->bindParam(':quantity', $item['quantity'], PDO::PARAM_INT);
+            $stmt->bindParam(':product_id', $product_id, PDO::PARAM_INT);
+            $stmt->execute();
         }
 
         // Xóa giỏ hàng sau khi đặt hàng thành công
@@ -61,4 +68,5 @@ try {
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => 'Lỗi: ' . $e->getMessage()]);
 }
+
 ?>

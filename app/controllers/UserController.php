@@ -1,14 +1,54 @@
 <?php
-require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/BaseController.php';
+require_once __DIR__ . '/../models/NguoiDung.php';
 
-class UserController {
-    private $conn;
+class UserController extends BaseController {
+    private $nguoiDungModel;
 
     public function __construct() {
         $database = new Database();
         $this->conn = $database->getConnection();
+        parent::__construct();
+        $this->nguoiDungModel = new NguoiDung($this->db);
     }
 
+    public function index($page = 1) {
+        try {
+            $limit = 10;
+            $users = $this->nguoiDungModel->getAllUsers($page, $limit);
+            $totalUsers = $this->nguoiDungModel->getTotalUsers();
+            $totalPages = ceil($totalUsers / $limit);
+
+            return [
+                'users' => $users,
+                'currentPage' => $page,
+                'totalPages' => $totalPages,
+                'totalUsers' => $totalUsers
+            ];
+        } catch (Exception $e) {
+            error_log("Error in UserController::index: " . $e->getMessage());
+            return [
+                'users' => [],
+                'currentPage' => 1,
+                'totalPages' => 0,
+                'totalUsers' => 0
+            ];
+        }
+    }
+
+    public function getUserForEdit($id) {
+        try {
+            $user = $this->nguoiDungModel->getUser($id);
+            return [
+                'user' => $user
+            ];
+        } catch (Exception $e) {
+            error_log("Error in UserController::getUserForEdit: " . $e->getMessage());
+            return [
+                'user' => null
+            ];
+        }
+    }
     public function login() {
         if ($_SERVER['REQUEST_METHOD'] != 'POST') return;
 
@@ -21,19 +61,19 @@ class UserController {
             $user = $stmt->fetch();
 
             if (!$user) {
-                $_SESSION['login_error'] = 'Email hoặc tên đăng nhập không tồn tại';
+                $_SESSION['login_error'] = 'Email không đúng hoặc không tồn tại !';
                 header("Location: /WebbandoTT/dang-nhap");
                 exit();
             }
 
             if (!password_verify($password, $user['password'])) {
-                $_SESSION['login_error'] = 'Mật khẩu không chính xác';
+                $_SESSION['login_error'] = 'Mật khẩu không chính xác !';
                 header("Location: /WebbandoTT/dang-nhap");
                 exit();
             }
 
             if ($user['trang_thai'] != 1) {
-                $_SESSION['login_error'] = 'Tài khoản đã bị khóa';
+                $_SESSION['login_error'] = 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên để biết thông tin !';
                 header("Location: /WebbandoTT/dang-nhap");
                 exit();
             }
@@ -69,7 +109,7 @@ class UserController {
             $stmt = $this->conn->prepare("SELECT COUNT(*) FROM users WHERE username = ? OR email = ?");
             $stmt->execute([$username, $email]);
             if ($stmt->fetchColumn() > 0) {
-                $_SESSION['register_error'] = 'Username hoặc email đã tồn tại';
+                $_SESSION['register_error'] = 'Username hoặc email đã tồn tại !';
                 header("Location: /WebbandoTT/dang-ky");
                 exit();
             }
@@ -107,3 +147,4 @@ class UserController {
         exit();
     }
 }
+?>

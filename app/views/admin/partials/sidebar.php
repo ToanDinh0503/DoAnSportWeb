@@ -48,19 +48,22 @@
                 </a>
             </div>
         </div>
+        <div class="sidebar-section">
+            <div class="section-title">Quản lý bài viết</div>
+            <div class="nav-item">
+                <a href="/WebbandoTT/admin/blogs" class="nav-link <?php echo $route === '/admin/blogs' ? 'active' : ''; ?>">
+                    <i class='bx bxs-file'></i>
+                    <span>Bài viết</span>
+                </a>
+            </div>
+        </div>
 
         <div class="sidebar-section">
             <div class="section-title">Quản lý người dùng</div>
             <div class="nav-item">
-                <a href="/WebbandoTT/admin/customers" class="nav-link <?php echo $route === '/admin/customers' ? 'active' : ''; ?>">
+                <a href="/WebbandoTT/admin/users" class="nav-link <?php echo $route === '/admin/users' ? 'active' : ''; ?>">
                     <i class='bx bxs-user-detail'></i>
-                    <span>Khách hàng</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="/WebbandoTT/admin/staff" class="nav-link <?php echo $route === '/admin/staff' ? 'active' : ''; ?>">
-                    <i class='bx bxs-user-account'></i>
-                    <span>Nhân viên</span>
+                    <span>Người dùng</span>
                 </a>
             </div>
         </div>
@@ -77,13 +80,11 @@
 <script>
 function handleAdminLogout() {
     if (confirm('Bạn có chắc chắn muốn đăng xuất?')) {
-        // Xóa session
         fetch('/WebbandoTT/dang-xuat', {
             method: 'POST',
             credentials: 'include'
         })
         .then(() => {
-            // Chuyển hướng về trang đăng nhập
             window.location.href = '/WebbandoTT/dang-nhap';
         })
         .catch(error => {
